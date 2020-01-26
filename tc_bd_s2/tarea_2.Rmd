@@ -36,7 +36,44 @@ Para hacer incluir un repositorio propio dentro del proyecto para trabajar.
 
 
 ```{r}
-library(sparklyr)
+library(nodbi)
+library(sofa)
+library(dplyr)
+```
+
+```{r}
+# -------------------------------------------
+# Sofa package
+# Create a CouchDB connection client
+(couchdb_conn <- Cushion$new(user="admin", pwd="admin"))
+# Creates the database
+db_create(couchdb_conn, "mov_mig_cr")
+
+# -------------------------------------------
+# nodbi package
+files <- list.files("mov_mig_cr_parts", full.names = TRUE)
+df <- read.csv(files[1])
+# creates connection to CouchDB
+src <- src_couchdb(user="admin", pwd="admin")
+
+doc <- docdb_create(src, key="mov_mig_cr", value=df)
+# Load CSV parts to mongo
+
+
+for (file in files) {
+  print(file)
+}
+
+```
+
+```{r}
+result <- docdb_get(src, "mov_mig_cr")
+```
+
+```{r}
+test<- result %>%
+  group_by(NAC_ID) %>%
+  count()
 ```
 
 ```{r}

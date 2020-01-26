@@ -38,3 +38,6 @@ rsconnect/
 .Rproj.user
 
 logs/
+
+
+mov_mig_cr_parts/*

@@ -9,8 +9,17 @@ editor_options:
 
 ## Tarea sesión 3
 
-### Descripción tarea
-Levanta una instancia local de Spark ([siguiendo los pasos aqui]()) y ejecuta los siguientes pasos. Puedes usar el marco de codigo (el *chunk*) para incluir tu respuesta y enviar la tarea finalizada.
+Descripción :
+Debe generar un pdf, en el cual se expliqué los pasos que utilizó para conectarse a Spark desde R utilizando sparklyr. Mostar por medio de imágenes y su respectiva explicación de cada uno de los siguientes puntos:
+
+Versión de Java
+Instalación de librerías y Spark
+Conexión a Spark
+Conexión a la web IU de Spark
+Desconexión a Spark
+Además debe crear RMarkdown donde al menos utilice 3 datasets en los cuales aplique 3 funciones vistas en clases ("Filter,mutate ......") y con su respectivo gráfico para demostrar el resultado final utilizando SPARK y salvar los datos obtenidos.
+
+#Nota: Si eres una de las personas que no utiliza los datos del gobierno, por favor contacta al profesor para decidir sobre cuales datos vas a trabajar.
 
 
 ## Copia datos
