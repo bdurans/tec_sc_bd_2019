@@ -39,6 +39,7 @@ Para hacer incluir un repositorio propio dentro del proyecto para trabajar.
 library(nodbi)
 library(sofa)
 library(dplyr)
+library(feather)
 ```
 
 ```{r}
@@ -49,10 +50,10 @@ library(dplyr)
 # Creates the database
 db_create(couchdb_conn, "mov_mig_cr")
 
-# -------------------------------------------
+  # -------------------------------------------
 # nodbi package
 files <- list.files("mov_mig_cr_parts", full.names = TRUE)
-df <- read.csv(files[1])
+df <- read.csv(files[2])
 # creates connection to CouchDB
 src <- src_couchdb(user="admin", pwd="admin")
 
@@ -67,7 +68,7 @@ for (file in files) {
 ```
 
 ```{r}
-result <- docdb_get(src, "mov_mig_cr")
+result <- docdb_query(src, "mov_mig_cr", query = 'http://127.0.0.1:5984/mov_mig_cr/_design/migrations/_view/find?limit=10')
 ```
 
 ```{r}
@@ -94,3 +95,37 @@ test<- result %>%
 sc <- spark_connect(master = "local")
 ```
 
+```{r}
+dtf <- read_feather("D:\\Documents\\mov_mig_cr\\mov_mig_cr.feather")
+```
+
+
+```{r}
+order_by_nac_id <- dtf %>%
+  filter(DET_MOV_CICLO_MIGRATORIO == "E") %>%
+  group_by(NAC_ID) %>%
+  count()
+```
+
+
+```{r}
+entries_immigration_check_post <- dtf %>%
+  filter(DET_MOV_CICLO_MIGRATORIO == "E") %>%
+  group_by(PUE_ID_PUESTO_MIGRATORIO, NAC_ID) %>%
+  summarize(total = n()) %>%
+  arrange(desc(total), .by_group = TRUE, ) %>%
+  top_n(n = 3, wt = total)
+
+entries_immigration_check_post
+```
+
+```{r}
+exits_immigration_check_post <- dtf %>%
+  filter(DET_MOV_CICLO_MIGRATORIO == "S") %>%
+  group_by(PUE_ID_PUESTO_MIGRATORIO, NAC_ID) %>%
+  summarize(total = n()) %>%
+  arrange(desc(total), .by_group = TRUE, ) %>%
+  top_n(n = 3, wt = total)
+
+exits_immigration_check_post
+```
