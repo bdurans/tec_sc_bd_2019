@@ -33,99 +33,64 @@ Si trabajas con los datos de gobierno tienes completa disponibilidad de
 
 Para hacer incluir un repositorio propio dentro del proyecto para trabajar.
 
+# Llevar la información a una base de datos no relacional
+
+Al trabajar con los datos del gobierno decidí utilizar CouchDB para almacenar la información, esto porque existe una librería en R llamada **nodbi** que me permite solicitar la información a una base de datos en CouchDB y almacenarlos en un dataframe. Por lo tanto procedí a convertir el archivo Parquet con los datos del gobierno a un archivo CSV por medio de una librería de Python llamada **fastparquet**, una vez con el archivo CSV a mano, es posible cargarlo en CouchDB directamente con una paquete llamado **CouchImport**, el cual se obtiene por medio de NPM. El cargar la información en CouchDB me llevó varias horas, esto porque se hizo sobre un disco duro y no un SSD. Al final de todo este proceso se creo la siguiente base de datos:
+
+ ![](mov_mig_cr_db.png)
+
+Como puede observarse, ahora existe una base de datos de 22 GB y más de 31 millones de documentos. Cada documento tiene la siguiente estructura:
+
+
+
+Debido a la cantidad de documentos generados, generar las consultas deseadas se volvió un proceso inmanejable, porque aunque se intente manejar la información por partes por medio de paginación u otro método, el procesamiento de la información tomaría varias horas y probablemente los recursos con los que cuento actualmente no son suficientes, principalmente por la cantidad de memoria RAM, la cual es 16 GB.
+
+A continuación se encuentra un ejemplo que tenía pensado utilizar para cargar la información desde CouchDB utilizando la librería **nodbi**:
 
 
 ```{r}
 library(nodbi)
 library(sofa)
+```
+
+```{r}
+# -------------------------------------------
+# Crea una conexión con CouchDB
+src <- src_couchdb(user="admin", pwd="admin")
+# Obtiene los datos de la base de datos "mov_mig_cr" utlizando la conexión "src"
+doc <- docdb_create(src, key="mov_mig_cr", value=df) # <-- equivalente a hacer un _all_docs
+```
+
+Debido a que no me fue posible cargar los datos desde CouchDB a un dataframe para realizar las consultas con **dplyr**, he decidido cargar todos los datos del gobierno directamente en memoria utilzando el archivo Feather, lo cual si me fue posible.
+
+```{r}
 library(dplyr)
 library(feather)
 ```
 
 ```{r}
-# -------------------------------------------
-# Sofa package
-# Create a CouchDB connection client
-(couchdb_conn <- Cushion$new(user="admin", pwd="admin"))
-# Creates the database
-db_create(couchdb_conn, "mov_mig_cr")
-
-  # -------------------------------------------
-# nodbi package
-files <- list.files("mov_mig_cr_parts", full.names = TRUE)
-df <- read.csv(files[2])
-# creates connection to CouchDB
-src <- src_couchdb(user="admin", pwd="admin")
-
-doc <- docdb_create(src, key="mov_mig_cr", value=df)
-# Load CSV parts to mongo
-
-
-for (file in files) {
-  print(file)
-}
-
-```
-
-```{r}
-result <- docdb_query(src, "mov_mig_cr", query = 'http://127.0.0.1:5984/mov_mig_cr/_design/migrations/_view/find?limit=10')
-```
-
-```{r}
-test<- result %>%
-  group_by(NAC_ID) %>%
-  count()
-```
-
-```{r}
-# Standalone connection
-# conf <- spark_config()
-# conf$spark.executor.memory <- "2GB"
-# conf$spark.memory.fraction <- 0.9
-# conf$spark.executor.cores <- 2
-# conf$spark.dynamicAllocation.enabled <- "false"
-
-# sc <- spark_connect(master="spark://master-url:7077", 
-#              version = "2.1.0",
-#              config = conf,
-#              spark_home = "/opt/spark/")
-```
-
-```{r}
-sc <- spark_connect(master = "local")
-```
-
-```{r}
+# Carga el archivo feather a un dataframe por medio de la libreria feather
 dtf <- read_feather("D:\\Documents\\mov_mig_cr\\mov_mig_cr.feather")
 ```
 
+Cantidad de entradas por nacionalidad
 
 ```{r}
 order_by_nac_id <- dtf %>%
   filter(DET_MOV_CICLO_MIGRATORIO == "E") %>%
   group_by(NAC_ID) %>%
   count()
+order_by_nac_id
 ```
 
-
+Las 3 nacionalidades que más entran y salen para cada punto de entrada las
+ 
 ```{r}
-entries_immigration_check_post <- dtf %>%
-  filter(DET_MOV_CICLO_MIGRATORIO == "E") %>%
+top_nac_in_out <- dtf %>%
   group_by(PUE_ID_PUESTO_MIGRATORIO, NAC_ID) %>%
   summarize(total = n()) %>%
   arrange(desc(total), .by_group = TRUE, ) %>%
   top_n(n = 3, wt = total)
 
-entries_immigration_check_post
-```
-
-```{r}
-exits_immigration_check_post <- dtf %>%
-  filter(DET_MOV_CICLO_MIGRATORIO == "S") %>%
-  group_by(PUE_ID_PUESTO_MIGRATORIO, NAC_ID) %>%
-  summarize(total = n()) %>%
-  arrange(desc(total), .by_group = TRUE, ) %>%
-  top_n(n = 3, wt = total)
-
-exits_immigration_check_post
+top_nac_in_out
 ```
