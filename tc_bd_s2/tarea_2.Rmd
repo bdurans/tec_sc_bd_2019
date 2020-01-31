@@ -41,7 +41,7 @@ Al trabajar con los datos del gobierno decidí utilizar CouchDB para almacenar l
 
 Como puede observarse, ahora existe una base de datos de 22 GB y más de 31 millones de documentos. Cada documento tiene la siguiente estructura:
 
-
+ ![](document_structure.png)
 
 Debido a la cantidad de documentos generados, generar las consultas deseadas se volvió un proceso inmanejable, porque aunque se intente manejar la información por partes por medio de paginación u otro método, el procesamiento de la información tomaría varias horas y probablemente los recursos con los que cuento actualmente no son suficientes, principalmente por la cantidad de memoria RAM, la cual es 16 GB.
 
