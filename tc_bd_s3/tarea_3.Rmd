@@ -11,10 +11,9 @@ editor_options:
 #### Descripción tarea
 Levanta una instancia local de Spark y ejecuta los siguientes pasos.
 
-```{r message=FALSE, warning=FALSE}
+```{r}
 library(nycflights13)
 library(sparklyr)
-library(dplyr)
 ```
 
 <br>
@@ -24,17 +23,14 @@ library(dplyr)
 <b>Inicar conexión con Spark</b>
 
 ```{r}
-sc <- spark_connect(master = "local")
+vuelos <- # aqui el codigo para copiar nycflights13::flights a Spark
+aerolineas <- # aqui el codigo para copiar nycflights13::airlines a Spark
 ```
 
 <b>Copiar los datos a Spark RDD</b>
 
-```{r}
-flights_tbl  <- copy_to(sc, nycflights13::flights, "flights") # aqui el codigo para copiar nycflights13::flights a Spark
-airlines_tbl <- copy_to(sc, nycflights13::airlines, "airlines") # aqui el codigo para copiar nycflights13::airlines a Spark
-```
-
-<b>Pregunta:</b>
+<b> Cuandos RDD creó el paso arriba? </b>
+### Ejecuta un join sobre spark
 
 <b> Cuandos RDD creó el paso arriba? </b> <br>
 Se crearon 2 RDD
@@ -63,19 +59,25 @@ promedio_retrasos
 
 <br>
 
-#### Preguntas
+> Que pasa cuando cierras la sesión y la vuelves a abrir? 
+> estan los resultados que tenias antes aun en tu instancia de Spark? 
+> Explica lo que observas.
+```{r}
+# Standalone connection
+# conf <- spark_config()
+# conf$spark.executor.memory <- "2GB"
+# conf$spark.memory.fraction <- 0.9
+# conf$spark.executor.cores <- 2
+# conf$spark.dynamicAllocation.enabled <- "false"
 
+# sc <- spark_connect(master="spark://master-url:7077", 
+#              version = "2.1.0",
+#              config = conf,
+#              spark_home = "/opt/spark/")
+```
 
-<b>Que pasa cuando cierras la sesión y la vuelves a abrir?</b><br>
-Todos los RDD y el historial de procesos fueron eliminados
-
-<b>Estan los resultados que tenias antes aun en tu instancia de Spark?</b><br>
-No, todo fue eliminado
-
-<b>Explica lo que observas.</b><br>
-
-<p align="justify"> 
-Todas las operaciones que Spark realiza y la información que utiliza se manejan en memoria, la cual es vólatil. Al cerrar las sesión toda la información se elimina de la memoria, pero esta no se guarda en algún dispositivo de almacenamiento para ser utilizada luego, por lo que al levantar la sesión nuevamente, Spark no tiene forma de saber que ocurrió anteriormente, porque su naturaleza define que es una herramienta que trabaja en memoria exclusivamente.
-</p>
-
+```{r}
+library(sparklyr)
+sc <- spark_connect(master = "local")
+```
 
