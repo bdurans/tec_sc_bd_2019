@@ -28,21 +28,31 @@ Puedes usar cualquier paquete y cualquier transformacion sobre los datos. pero t
 
 ```{r}
 library(nycflights13)
-library( ... ) # aqui el paquete que decides usar
+```
 
-system.time({
-  
-  # codigo sin paralelizar
-   
-})
+```{r}
+library(multidplyr)
+library(dplyr, warn.conflicts = FALSE)
+```
 
+```{r}
+# codigo sin paralelizar
 system.time({
-  
-  # codigo que corre paralelo
-   
+  flight_dest <- flights %>% group_by(dest) %>%
+    summarise(delay = mean(dep_delay, na.rm = TRUE), n = n())
 })
 ```
 
+```{r}
+# codigo que corre paralelo
+system.time({
+  cluster <- new_cluster(4)
+  flight_dest_parallel <- flights %>% group_by(dest) %>% partition(cluster)
+  flight_dest_parallel %>% 
+  summarise(delay = mean(dep_delay, na.rm = TRUE), n = n()) %>% 
+  collect()
+})
+```
 ## Segunda implementacion
 
 ```{r}
