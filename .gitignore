@@ -37,6 +37,14 @@ vignettes/*.pdf
 rsconnect/
 .Rproj.user
 
+datos/
+
+
+logs/
+
+
+mov_mig_cr_parts/*
+
 logs/
 
 
