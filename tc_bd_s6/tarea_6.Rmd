@@ -1,24 +1,23 @@
 ---
-title: "Tarea 6"
-author: "Curso Big Data TEC"
+title: "Big Data: Tarea 6"
+author: "Brian Durán"
 output: html_document
 editor_options: 
   chunk_output_type: console
 ---
 
-## Tarea sesión 6
+## Descripción
 
-### Descripción tarea
+<p align="justify">
+
 En la clase hablamos sobre como aplicar los metodos de estadistica a escala. Uno de los conceptos más dificiles para bajar a tierra fué "datos en movimiento" (**streaming data**). 
 
 El [vignette del paquete stream](https://cran.r-project.org/web/packages/stream/vignettes/stream.pdf) da una introducción a fondo e incluye ejemplos. 
 
+Como tarea, lee el vignette del paquete stream mencionado arriba. Y sigue los ejemplos para validar que se ejecutan. Si tienes tiempo puedes incluir algunos ejemplos mas que estan descritos por los autores.
+</p>
 
-## Tarea
-Como tarea, lee el vignette del paquete stream mencionado arriba. Y sique los ejemplos para validar que ejecutan. Si tienes tiempo puedes incluir algunos ejemplos mas que estan descritos por los autores.
-
-
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(stream)
 set.seed(1000)
 stream <- DSD_Gaussians(k = 3, d = 3, noise = .5, p = c(.5, .3, .1))
@@ -28,12 +27,24 @@ p <- get_points(stream, n = 50)
 p
 ```
 
-> Pregunta: que significan los parametros k, d, noise, y p arriba? Para que los
-> puedes usar?
+<br>
+
+<b>¿Que significan los parametros k, d, noise, y p arriba? ¿Para que los puedes usar?</b>
+
+* k = Determina el número de clusters
+* d = Determina el número de dimensiones
+* noise = Probabilidad de ruido entre 0 y 1
+* p = Un vector de probabilidades que determina que tan probable es el generar un punto de datos a partir de un grupo particular
+ 
+<br>
+
+<b>Para que los puedes usar?</b>
+
+<br>
 
 Ahora miramos los datos moviendose
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(animation)
 
 set.seed(1000)
@@ -52,9 +63,12 @@ animation::ani.options(interval = .1)
 ani.replay()
 ```
 
-> Pregunta: Si piensas en cual es el promedio de X2 la respuesta va ser "depende 
-> de cuando miras, y de cuanta historia incluyes". Discute como esto impacta tu 
-> analisis y cuales soluciones le propondrias a un cliente.
+
+<p align="justify">
+<b>Si piensas en cual es el promedio de X2 la respuesta va ser "depende de cuando miras, y de cuanta historia incluyes". Discute como esto impacta tu analisis y cuales soluciones le propondrias a un cliente.</b>
+</p>
+
+
 
 
 
